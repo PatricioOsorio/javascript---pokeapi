@@ -9,9 +9,12 @@ const $loader = d.querySelector('.loader');
 
 let nextPokemons = '';
 
+const showLoader = () => ($loader.style.display = 'block');
+const hideLoader = () => ($loader.style.display = 'none');
+
 async function loadPokemons() {
   try {
-    $loader.style.display = 'block';
+    showLoader();
 
     let urlFetchApi = nextPokemons
       ? nextPokemons
@@ -53,7 +56,7 @@ async function loadPokemons() {
       $fragment.appendChild($clone);
     }
 
-    $loader.style.display = 'none';
+    hideLoader();
 
     $main.appendChild($fragment);
 
@@ -70,12 +73,12 @@ d.addEventListener('DOMContentLoaded', (e) => loadPokemons());
 
 w.addEventListener('scroll', (e) => {
   const { scrollTop, clientHeight, scrollHeight } = d.documentElement;
+  $loader.style.display = 'block';
 
-
-  if (scrollTop + clientHeight === scrollHeight) {
-    setTimeout(() => {
-      console.log('Cargando mas poquemones');
+  setTimeout(() => {
+    if (scrollTop + clientHeight >= scrollHeight) {
+      console.log('Cargando más pokemones');
       loadPokemons();
-    }, 1000);
-  }
+    }
+  }, 500);
 });
