@@ -1,67 +1,81 @@
 const d = document;
+const w = window;
+
 const $main = d.querySelector('main');
-const $links = d.querySelector('.links');
+const $template = d.querySelector('.pokemons-template').content;
+const $fragment = d.createDocumentFragment();
 
-const urlPokeapi = 'https://pokeapi.co/api/v2/pokemon/';
+const $loader = d.querySelector('.loader');
 
-async function loadPokemons(url) {
+let nextPokemons = '';
+
+async function loadPokemons() {
   try {
-    $main.innerHTML = `<div class="loader lds-ellipsis"><div></div><div></div><div></div><div></div></div>`;
+    $loader.style.display = 'block';
 
-    let response = await fetch(url);
-    let pokemons = await response.json();
+    let urlFetchApi = nextPokemons
+      ? nextPokemons
+      : 'https://pokeapi.co/api/v2/pokemon/';
+    let response = await fetch(urlFetchApi);
+    let pokemonsJson = await response.json();
 
-    let $template = '';
-    let $prevLink;
-    let $nextLink;
+    // console.log(pokemonsJson);
 
     if (!response.ok)
-      throw { status: response.status, statusText: response.statusText };
+      throw {
+        status: response.status,
+        statusText: response.statusText || 'Ocurrió un error',
+      };
 
-    for (const pokemon of pokemons.results) {
+    for (const pokemon of pokemonsJson.results) {
       try {
         let response = await fetch(pokemon.url);
-        let pokemonInfo = await response.json();
+        let pokemonJson = await response.json();
 
-        // console.log(pokemonInfo);
+        // console.log(pokemonJson);
 
         if (!response.ok)
           throw { status: response.status, statusText: response.statusText };
 
-        $template += `
-          <figure class="pokemon__card">
-            <img src="${pokemonInfo.sprites.front_default}" alt="${pokemonInfo.name}"/>
-            <figcaption>${pokemonInfo.name}</figcaption>
-          </figure>
-        `;
+        $template.querySelector('.pokemon__img').src =
+          pokemonJson.sprites.front_default;
+        $template.querySelector('.pokemon__img').alt = pokemonJson.name;
+        $template.querySelector('.pokemon__name').innerHTML = pokemonJson.name;
       } catch (error) {
         let message = error.statusText || 'Ocurrio un error';
-        $template += `
-          <figure class="pokemon__card">
-            <figcaption>Error ${error.status}: ${message}</figcaption>
-          </figure>
-        `;
+
+        $template.querySelector(
+          '.pokemon__name'
+        ).innerHTML = `Error ${error.status}: ${message}`;
       }
+
+      let $clone = d.importNode($template, true);
+      $fragment.appendChild($clone);
     }
 
-    $main.innerHTML = $template;
+    $loader.style.display = 'none';
 
-    $prevLink = pokemons.previous ? `<a href="${pokemons.previous}">⏮</a>` : ``;
-    $nextLink = pokemons.next ? `<a href="${pokemons.next}">⏩</a>` : ``;
+    $main.appendChild($fragment);
 
-    $links.innerHTML = `${$prevLink} ${$nextLink}`;
+    nextPokemons = pokemonsJson.next;
+    console.log(`nextPokemons : ${nextPokemons}`);
   } catch (error) {
     console.log(error);
     let message = error.statusText || 'Ocurrio un error';
-    $main.innerHTML = `<div class="error">Error ${error.status}: ${error.statusText}</div>`;
+    $main.innerHTML = `<div class="error">Error ${error.status}: ${message}</div>`;
   }
 }
 
-d.addEventListener('DOMContentLoaded', (e) => loadPokemons(urlPokeapi));
+d.addEventListener('DOMContentLoaded', (e) => loadPokemons());
 
-d.addEventListener('click', (e) => {
-  if (e.target.matches('.links a')) {
-    e.preventDefault();
-    loadPokemons(e.target.getAttribute('href'));
+w.addEventListener('scroll', (e) => {
+  const { scrollTop, clientHeight, scrollHeight } = d.documentElement;
+
+
+  if (scrollTop + clientHeight === scrollHeight) {
+    setTimeout(() => {
+      console.log('Cargando mas poquemones');
+      loadPokemons();
+    }, 1000);
   }
 });

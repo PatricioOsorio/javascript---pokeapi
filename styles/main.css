@@ -34,13 +34,8 @@ body {
   background-color: var(--foreground-primary);
 }
 
-.links {
-  text-align: center;
-  font-size: 1.5rem;
-}
-
 .title {
-  font-size: 2rem;
+  font-size: 4rem;
   text-align: center;
   background: #ff7b00; /* fallback for old browsers */
   background: -webkit-linear-gradient(
@@ -76,14 +71,18 @@ body {
   transform: scale(0.9);
 }
 
+.pokemon__img {
+  border-radius: var(--radius);
+  background-color: var(--foreground-primary);
+}
+
 /* Loader */
 .loader {
-  display: inline-block;
+  display: block;
   margin: auto;
 }
 
 .lds-ellipsis {
-  display: inline-block;
   position: relative;
   width: 80px;
   height: 80px;

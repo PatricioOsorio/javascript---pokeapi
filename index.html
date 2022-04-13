@@ -5,12 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pokeapi</title>
+    <link rel="stylesheet" href="styles/normalize-8.0.1-min.css" />
     <link rel="stylesheet" href="styles/main.css" />
   </head>
   <body>
     <h1 class="title">Pokemons</h1>
-    <nav class="links"></nav>
     <main class="grid-fluid"></main>
+    <div class="loader lds-ellipsis">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+
+    <template class="pokemons-template">
+      <figure class="pokemon__card">
+        <img class="pokemon__img""/>
+        <figcaption class="pokemon__name"></figcaption>
+      </figure>
+    </template>
+
     <script src="scripts/main.js"></script>
   </body>
 </html>
